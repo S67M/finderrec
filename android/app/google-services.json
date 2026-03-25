@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "998394170084",
+    "project_id": "finderrec",
+    "storage_bucket": "finderrec.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:998394170084:android:8ad2e328326a0cb5493af1",
+        "android_client_info": {
+          "package_name": "com.example.finderrec"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4A77PgyQvAd51eWqFK221TfXiF5NJnUo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
