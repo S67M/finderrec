@@ -33,6 +33,13 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
         _recipes = all.where((r) => 
           r.ingredients.any((ing) => widget.ingredients!.contains(ing))
         ).toList();
+        
+        // Sort recipes by highest ingredient match
+        _recipes.sort((a, b) {
+          final countA = a.ingredients.where((ing) => widget.ingredients!.contains(ing)).length;
+          final countB = b.ingredients.where((ing) => widget.ingredients!.contains(ing)).length;
+          return countB.compareTo(countA);
+        });
       } else {
         _recipes = all;
       }
