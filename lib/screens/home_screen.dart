@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: (currentIndex == 0 && selectedIngredients.isNotEmpty) 
+      floatingActionButton: (currentIndex == 0 && selectedIngredients.length >= 3) 
           ? FloatingActionButton.extended(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => RecipeListScreen(ingredients: selectedIngredients.toList())));
