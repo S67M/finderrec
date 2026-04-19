@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../main.dart'; // To access AuthWrapper
 
@@ -59,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                ),
               const SizedBox(height: 32),
-              const Text("Welcome Back", textAlign: TextAlign.center, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+              Text("Welcome Back", textAlign: TextAlign.center, style: GoogleFonts.playfairDisplay(fontSize: 28, fontWeight: FontWeight.w700, color: const Color(0xFF2D3142))),
               const SizedBox(height: 40),
               _buildTextField(controller: _emailController, label: "Email", icon: Icons.email_outlined),
               const SizedBox(height: 20),
@@ -178,7 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                ),
               const SizedBox(height: 24),
-              const Text("Create Account", textAlign: TextAlign.center, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF2D3142))),
+              Text("Create Account", textAlign: TextAlign.center, style: GoogleFonts.playfairDisplay(fontSize: 28, fontWeight: FontWeight.w700, color: const Color(0xFF2D3142))),
               const SizedBox(height: 32),
               _buildTextField(controller: _nameController, label: "Full Name", icon: Icons.person_outline),
               const SizedBox(height: 16),

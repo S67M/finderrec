@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/db_service.dart';
@@ -32,10 +33,12 @@ class RecipeApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Recipe Finder',
       theme: ThemeData(
-        fontFamily: 'Inter',
-        scaffoldBackgroundColor: const Color(0xFFF7F9FC),
-        primaryColor: const Color(0xFFFFA559),
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFFA559)),
+        scaffoldBackgroundColor: const Color(0xFFFFF8F3),
+        primaryColor: const Color(0xFFF4631E),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFF4631E)),
+        textTheme: GoogleFonts.dmSansTextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
       home: const AuthWrapper(),
     );

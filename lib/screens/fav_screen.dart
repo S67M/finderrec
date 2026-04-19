@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'db_service.dart';
 import 'recipe_model.dart';
 import 'recipe_list_screen.dart'; // We can reuse the same card layout if we want, or build it here.
@@ -31,7 +31,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC),
+      backgroundColor: const Color(0xFFFFF8F3),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFFFF8F3),
+        elevation: 0,
+        leading: const BackButton(color: Color(0xFF2D3142)),
+        centerTitle: true,
+        title: Text(
+          'Favorites',
+          style: GoogleFonts.playfairDisplay(
+            color: const Color(0xFF2D3142),
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
+        ),
+      ),
       body: StreamBuilder<List<String>>(
         stream: _db.getFavorites(),
         builder: (context, snapshot) {
