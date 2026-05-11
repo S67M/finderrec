@@ -7,7 +7,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF9F3), // Off-white with orange tint
+      backgroundColor: const Color(0xFFFFF9F3),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -18,26 +18,23 @@ class WelcomeScreen extends StatelessWidget {
                Hero(
                   tag: 'app_logo',
                   child: Center(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: Image.asset('assets/logo.png', height: 160),
-                    )
+                    child: Image.asset('assets/logo.png', height: 160),
                   ),
                ),
                const SizedBox(height: 48),
                const Text(
-                 "Recipe Finder", 
-                 textAlign: TextAlign.center, 
+                 "Recipe Finder",
+                 textAlign: TextAlign.center,
                  style: TextStyle(
-                   fontSize: 32, 
-                   fontWeight: FontWeight.bold, 
+                   fontSize: 32,
+                   fontWeight: FontWeight.bold,
                    color: Color(0xFF2D3142)
                  )
                ),
                const SizedBox(height: 16),
                const Text(
-                 "Discover, Cook, and Enjoy!", 
-                 textAlign: TextAlign.center, 
+                 "Discover, Cook, and Enjoy!",
+                 textAlign: TextAlign.center,
                  style: TextStyle(fontSize: 16, color: Colors.black54)
                ),
                const SizedBox(height: 60),

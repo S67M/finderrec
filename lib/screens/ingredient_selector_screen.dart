@@ -148,7 +148,7 @@ class _IngredientSelectorScreenState extends State<IngredientSelectorScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          'Find Recipes',
+          'Pick Ingredients',
           style: GoogleFonts.playfairDisplay(
             color: const Color(0xFF2D3142),
             fontWeight: FontWeight.w700,

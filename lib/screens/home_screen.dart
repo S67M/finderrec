@@ -4,6 +4,7 @@ import 'categories_screen.dart';
 import 'fav_screen.dart';
 import 'ingredient_selector_screen.dart';
 import 'my_kitchen_screen.dart';
+import 'myrecipes_screen.dart';
 import 'profile_screen.dart';
 
 // ── Brand colours ─────────────────────────────────────────────────────────────
@@ -108,14 +109,14 @@ class _HomeGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final cards = [
       _FeatureCardData(
-        label: 'Find Recipes',
+        label: 'Pick Ingredients',
         subtitle: 'Pick ingredients & search',
         icon: Icons.search_rounded,
         cardIndex: 0,
         destination: const IngredientSelectorScreen(),
       ),
       _FeatureCardData(
-        label: 'Recipes',
+        label: 'All Recipes',
         subtitle: 'Browse by category',
         icon: Icons.menu_book,
         cardIndex: 1,
@@ -129,11 +130,11 @@ class _HomeGrid extends StatelessWidget {
         destination: const FavoritesScreen(),
       ),
       _FeatureCardData(
-        label: 'My Kitchen',
-        subtitle: 'Manage your pantry',
-        icon: Icons.soup_kitchen_rounded,
+        label: 'My Recipes',
+        subtitle: 'Your added recipes',
+        icon: Icons.receipt_long_rounded,
         cardIndex: 3,
-        destination: const MyKitchenScreen(),
+        destination: const MyrecipesScreen(),
       ),
     ];
 
@@ -275,7 +276,7 @@ class _FeatureCardData {
 
 List<Widget> _cardDecorations(int index) {
   switch (index) {
-    case 0: // Find Recipes — scattered circles
+    case 0: // Pick Ingredients — scattered circles
       return [
         Positioned(
           bottom: 8, right: 8,
@@ -376,7 +377,7 @@ List<Widget> _cardDecorations(int index) {
         ),
       ];
 
-    case 3: // My Kitchen — circles + small rounded square
+    case 3: // My Recipes — circles + small rounded square
       return [
         Positioned(
           bottom: 8, right: 8,
