@@ -38,6 +38,7 @@ dependencies:
   firebase_auth: ^6.3.0
   cloud_firestore: ^6.2.0
   google_fonts: ^6.2.1
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:
@@ -94,3 +95,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/logo.png"
+  adaptive_icon_background: "#FFDCC8"
+  adaptive_icon_foreground: "assets/logo.png"

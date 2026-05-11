@@ -6,12 +6,15 @@ class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
   final List<Map<String, String>> categories = const [
-    {'name': 'Desserts', 'image': 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=500'},
-    {'name': 'Gluten-Free', 'image': 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500'},
-    {'name': 'High Protein', 'image': 'https://images.unsplash.com/photo-1544025162-d76694265947?w=500'},
+   {'name': 'High Protein', 'image': 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=500'},
+    {'name': 'Gluten-Free', 'image': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500'},
+    {'name': 'Seafood', 'image': 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=500'},
+    {'name': 'Sandwiches', 'image': 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=500'},
+    {'name': 'Soups', 'image': 'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=500'},
+    {'name': 'Salads', 'image': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500'},
+    {'name': 'Desserts', 'image': 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=500'},
     {'name': 'Juices', 'image': 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500'},
-    {'name': 'Fast Food', 'image': 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=500'},
-    {'name': 'Healthy Meals', 'image': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500'},
+    {'name': 'Others', 'image': 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=500'},
   ];
 
   @override

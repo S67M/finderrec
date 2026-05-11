@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'add_recipe_screen.dart';
+import 'myrecipes_screen.dart';
 
 // ── Brand colours (mirrored from home_screen) ─────────────────────────────────
 const _kOrange = Color(0xFFF4631E);
@@ -113,13 +115,11 @@ class _KitchenCardState extends State<_KitchenCard>
     super.dispose();
   }
 
-  void _onTap() {
+  void _onTap(BuildContext context) {
     if (widget.cardIndex == 0) {
-      // ignore: avoid_print
-      print('add recipe');
+    Navigator.push(context, MaterialPageRoute(builder: (_) => AddRecipeScreen()));
     } else {
-      // ignore: avoid_print
-      print('my recipes');
+    Navigator.push(context, MaterialPageRoute(builder: (_) => MyrecipesScreen()));
     }
   }
 
@@ -129,7 +129,7 @@ class _KitchenCardState extends State<_KitchenCard>
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) {
         _controller.reverse();
-        _onTap();
+        _onTap(context);
       },
       onTapCancel: () => _controller.reverse(),
       child: ScaleTransition(

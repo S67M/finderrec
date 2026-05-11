@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'db_service.dart';
 import 'recipe_model.dart';
 
@@ -117,7 +118,18 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
   }
 
   void _fetchRecipes() async {
-    final all = await _db.getAllRecipes();
+    // For ingredient search, include the user's own recipes alongside public ones.
+    // For category browse, show every recipe (getAllRecipes).
+    List<Recipe> all;
+    if (widget.ingredients != null && widget.ingredients!.isNotEmpty) {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      all = uid != null
+          ? await _db.getAllRecipesForUser(uid)
+          : await _db.getAllRecipes();
+    } else {
+      all = await _db.getAllRecipes();
+    }
+
     setState(() {
       if (widget.category != null) {
         // ── Category browse — simple filter, no priority logic ────────────────
@@ -174,6 +186,7 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
       _loading = false;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
