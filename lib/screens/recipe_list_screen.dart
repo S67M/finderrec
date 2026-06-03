@@ -190,7 +190,9 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.category ?? "Search Results";
+    final title = widget.category != null
+        ? widget.category!
+        : 'Search Results (${_recipes.length})';
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
       appBar: AppBar(
