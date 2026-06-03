@@ -43,7 +43,7 @@ class DBService {
           .where((d) => d.data()['isUserRecipe'] != true)
           .toList();
 
-      if (systemRecipes.length >= 26) return;
+      if (systemRecipes.length >= 30) return;
 
       // Delete old system recipes
       final batch = _db.batch();
@@ -296,6 +296,42 @@ class DBService {
           'instructions': 'Cook rice and let cool slightly. Roast chickpeas with salt and black pepper at 200°C for 15 min. Slice cucumber, carrot and avocado. Whisk lemon juice, tahini, garlic, soy sauce and honey for dressing. Arrange rice, chickpeas, cucumber, carrot, avocado and spinach in a bowl. Drizzle dressing over and serve.',
           'imageUrl': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80',
         },
+
+        // ── TRADITIONAL (2) ─────────────────────────────────────────────────
+        {
+          'name': 'Lamb Tagine',
+          'category': 'Traditional',
+          'ingredients': ['Lamb', 'Potato', 'Carrot', 'Onion', 'Tomato', 'Garlic', 'Cumin', 'Paprika', 'Turmeric', 'Olive Oil', 'Salt'],
+          'prepTime': 75,
+          'instructions': '1. Cut lamb into chunks and season with cumin, paprika, turmeric, salt.\n2. Heat oil in a deep pot, brown the lamb on all sides.\n3. Add chopped onion and garlic, cook 3 minutes.\n4. Add diced tomatoes, carrots, and potatoes.\n5. Pour 1 cup of water, cover and simmer on low heat for 60 minutes.\n6. Serve hot with bread.',
+          'imageUrl': 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800',
+        },
+        {
+          'name': 'Shakshuka',
+          'category': 'Traditional',
+          'ingredients': ['Egg', 'Tomato', 'Pepper', 'Onion', 'Garlic', 'Tomato Sauce', 'Cumin', 'Paprika', 'Chili Powder', 'Oil', 'Salt'],
+          'prepTime': 25,
+          'instructions': '1. Heat oil in a skillet over medium heat.\n2. Sauté diced onion, garlic, and peppers for 5 minutes.\n3. Add diced tomatoes and tomato sauce.\n4. Season with cumin, paprika, chili, and salt.\n5. Simmer sauce for 10 minutes.\n6. Make 4 wells in the sauce and crack an egg into each.\n7. Cover and cook 5–7 minutes until eggs are set.\n8. Serve with bread.',
+          'imageUrl': 'https://images.unsplash.com/photo-1590412200988-a436970781fa?w=800',
+        },
+
+        // ── BREAKFAST (2) ────────────────────────────────────────────────────
+        {
+          'name': 'Fluffy Pancakes',
+          'category': 'Breakfast',
+          'ingredients': ['Flour', 'Egg', 'Milk', 'Butter', 'Sugar', 'Salt', 'Baking Powder'],
+          'prepTime': 20,
+          'instructions': '1. Mix flour, sugar, salt, and baking powder in a bowl.\n2. In another bowl, whisk egg, milk, and melted butter.\n3. Combine wet and dry ingredients — do not overmix, lumps are fine.\n4. Heat a non-stick pan on medium, add a little butter.\n5. Pour 1/4 cup batter per pancake.\n6. Cook until bubbles form (~2 min), flip and cook 1 more minute.\n7. Serve with honey or fresh fruit.',
+          'imageUrl': 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800',
+        },
+        {
+          'name': 'Avocado Egg Toast',
+          'category': 'Breakfast',
+          'ingredients': ['Bread', 'Egg', 'Avocado', 'Lemon', 'Salt', 'Black Pepper', 'Chili Powder', 'Olive Oil'],
+          'prepTime': 10,
+          'instructions': '1. Toast 2 slices of bread until golden and crispy.\n2. Mash avocado with lemon juice, salt, and black pepper.\n3. Spread avocado mixture generously on each slice.\n4. Fry or poach eggs to your liking.\n5. Place egg on top of avocado toast.\n6. Sprinkle with chili powder and a drizzle of olive oil.\n7. Serve immediately.',
+          'imageUrl': 'https://images.unsplash.com/photo-1482049016688-2d3e1b311543?w=800',
+        },
       ];
 
       final addBatch = _db.batch();
@@ -338,5 +374,34 @@ class DBService {
       if (!snapshot.exists) return [];
       return List<String>.from(snapshot.data()?['favorites'] ?? []);
     });
+  }
+
+  // ── Custom Ingredients ─────────────────────────────────────────────────────
+
+  /// Saves a new custom ingredient to the global `custom_ingredients` collection.
+  Future<void> addCustomIngredient(String name, String category) async {
+    await _db.collection('custom_ingredients').add({
+      'name': name.trim(),
+      'category': category,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  /// Real-time stream of all custom ingredients as `{name, category}` maps.
+  Stream<List<Map<String, String>>> getCustomIngredients() {
+    return _db
+        .collection('custom_ingredients')
+        .orderBy('createdAt')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) {
+              final data = doc.data();
+              return {
+                'name':     data['name']     as String? ?? '',
+                'category': data['category'] as String? ?? '',
+              };
+            })
+            .where((m) => m['name']!.isNotEmpty && m['category']!.isNotEmpty)
+            .toList());
   }
 }

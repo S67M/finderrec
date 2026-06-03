@@ -28,6 +28,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     {'name': 'Salads',        'image': 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500'},
     {'name': 'Desserts',      'image': 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=500'},
     {'name': 'Juices',        'image': 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500'},
+    {'name': 'Traditional',   'image': 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800'},
+    {'name': 'Breakfast',     'image': 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800'},
   ];
 
   // ── All-recipes state ─────────────────────────────────────────────────────
@@ -89,7 +91,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 1.55, // ~130px tall on typical phones
+                mainAxisExtent: 130,
               ),
               itemBuilder: (context, index) {
                 final cat = categories[index];

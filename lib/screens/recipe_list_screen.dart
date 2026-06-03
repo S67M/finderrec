@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../constants/ingredients.dart';
 import 'db_service.dart';
 import 'recipe_model.dart';
 
@@ -12,27 +13,6 @@ const List<String> _bigFour = [
   "Grains & Carbs",
   "Fruits",
 ];
-
-const Map<String, String> _ingredientCategory = {
-  "Oil": "Basics", "Salt": "Basics", "Sugar": "Basics", "Garlic": "Basics",
-  "Rice": "Grains & Carbs", "Pasta": "Grains & Carbs", "Bread": "Grains & Carbs", "Flour": "Grains & Carbs",
-  "Milk": "Dairy & Fats", "Butter": "Dairy & Fats", "Cheese": "Dairy & Fats",
-  "Chicken": "Proteins", "Beef": "Proteins", "Fish": "Proteins", "Turkey": "Proteins",
-  "Egg": "Proteins", "Shrimp": "Proteins", "Tuna": "Proteins", "Salmon": "Proteins",
-  "Lentils": "Proteins", "Beans": "Proteins", "Tofu": "Proteins",
-  "Potato": "Vegetables", "Onion": "Vegetables", "Tomato": "Vegetables", "Carrot": "Vegetables",
-  "Broccoli": "Vegetables", "Cucumber": "Vegetables", "Spinach": "Vegetables", "Pepper": "Vegetables",
-  "Zucchini": "Vegetables", "Eggplant": "Vegetables", "Cabbage": "Vegetables", "Corn": "Vegetables",
-  "Apple": "Fruits", "Banana": "Fruits", "Orange": "Fruits", "Lemon": "Fruits",
-  "Strawberry": "Fruits", "Mango": "Fruits", "Pineapple": "Fruits", "Grapes": "Fruits",
-  "Peach": "Fruits", "Avocado": "Fruits",
-  "Parsley": "Herbs", "Cilantro": "Herbs", "Basil": "Herbs", "Mint": "Herbs",
-  "Oregano": "Herbs", "Thyme": "Herbs", "Rosemary": "Herbs", "Dill": "Herbs",
-  "Black Pepper": "Spices", "Paprika": "Spices", "Turmeric": "Spices", "Cumin": "Spices",
-  "Cinnamon": "Spices", "Chili Powder": "Spices", "Ginger": "Spices", "Garlic Powder": "Spices",
-  "Tomato Sauce": "Pantry", "Soy Sauce": "Pantry", "Vinegar": "Pantry", "Honey": "Pantry",
-  "Mustard": "Pantry", "Mayonnaise": "Pantry", "Ketchup": "Pantry",
-};
 
 const List<String> _categoryPriority = [
   "Proteins",
@@ -47,13 +27,15 @@ const List<String> _categoryPriority = [
 ];
 
 // ── Priority sort ──────────────────────────────────────────────────────────────
+// [ingredientCategory] is the combined base + custom map built at runtime.
 
 List<Recipe> _sortByPriority(
   List<Recipe> recipes,
   List<String> selected,
+  Map<String, String> ingredientCategory,
 ) {
   final selectedBigFour = selected
-      .where((i) => _bigFour.contains(_ingredientCategory[i]))
+      .where((i) => _bigFour.contains(ingredientCategory[i]))
       .toList();
 
   // Law 2 — keep only recipes that match at least one bigFour selected ingredient
@@ -72,7 +54,7 @@ List<Recipe> _sortByPriority(
 
     for (final category in _categoryPriority) {
       final catIngredients =
-          selected.where((i) => _ingredientCategory[i] == category).toList();
+          selected.where((i) => ingredientCategory[i] == category).toList();
       final matchA =
           catIngredients.where((i) => a.ingredients.contains(i)).length;
       final matchB =
@@ -111,13 +93,31 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
   bool _loading = true;
   bool _showShoppingMessage = false; // Law 1
 
+  // Custom ingredients loaded from Firestore before filtering
+  List<Map<String, String>> _customIngredients = [];
+
   @override
   void initState() {
     super.initState();
+    _loadAndFetch();
+  }
+
+  /// Loads custom ingredients first, then runs the recipe fetch + filter logic.
+  Future<void> _loadAndFetch() async {
+    try {
+      // Wait for the first emission of the custom ingredients stream
+      final custom = await _db.getCustomIngredients().first;
+      if (mounted) setState(() => _customIngredients = custom);
+    } catch (_) {
+      // If the collection doesn't exist yet, proceed with empty list
+    }
     _fetchRecipes();
   }
 
   void _fetchRecipes() async {
+    // Build the complete ingredient→category map (base + custom)
+    final ingredientCategory = buildIngredientCategoryMap(_customIngredients);
+
     // For ingredient search, include the user's own recipes alongside public ones.
     // For category browse, show every recipe (getAllRecipes).
     List<Recipe> all;
@@ -140,7 +140,7 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
 
         // ── Law 1 — Shopping message if no bigFour ingredient selected ────────
         final hasBigFour = selected
-            .any((i) => _bigFour.contains(_ingredientCategory[i]));
+            .any((i) => _bigFour.contains(ingredientCategory[i]));
 
         if (!hasBigFour) {
           _showShoppingMessage = true;
@@ -166,7 +166,7 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
         }
 
         // ── Step 2: Sort by bigFour + category priority ───────────────────────
-        _recipes = _sortByPriority(_recipes, selected);
+        _recipes = _sortByPriority(_recipes, selected, ingredientCategory);
 
         // ── Step 3: Apply time filter ─────────────────────────────────────────
         final tf = widget.timeFilter;
