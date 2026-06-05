@@ -7,9 +7,14 @@ import 'recipe_list_screen.dart';
 // ── Three-state enum ──────────────────────────────────────────────────────────
 enum IngredientState { none, selected, excluded }
 
+// A screen widget representing the ingredient search filter interface.
+// This exists to allow users to select/exclude ingredients and choose duration filters to search matching recipes.
+// Returns: An IngredientSelectorScreen widget.
 class IngredientSelectorScreen extends StatefulWidget {
   const IngredientSelectorScreen({super.key});
 
+  // Creates the mutable state object for this screen.
+  // Returns: An instance of _IngredientSelectorScreenState.
   @override
   State<IngredientSelectorScreen> createState() =>
       _IngredientSelectorScreenState();
@@ -27,9 +32,14 @@ class _IngredientSelectorScreenState extends State<IngredientSelectorScreen> {
   String _selectedTimeFilter = "Any";
 
   // ── State cycling logic ────────────────────────────────────────────────────
+  // Cycles the selection state of a specific ingredient between none -> selected -> excluded -> none.
+  // This exists to handle user input when they tap an ingredient chip.
+  // Modifies: Updates the ingredientStates map entry for the target ingredient.
+  // Returns: void.
   void onIngredientTap(String ingredient) {
     setState(() {
       final current = ingredientStates[ingredient] ?? IngredientState.none;
+      // Cycle selection: none -> selected -> excluded -> none
       if (current == IngredientState.none) {
         ingredientStates[ingredient] = IngredientState.selected;
       } else if (current == IngredientState.selected) {
@@ -41,17 +51,26 @@ class _IngredientSelectorScreenState extends State<IngredientSelectorScreen> {
   }
 
   // ── Helpers ────────────────────────────────────────────────────────────────
+  // Computes the list of currently selected/included ingredient names.
+  // This exists to compile the list of positive search filters.
+  // Returns: A list of ingredient name strings.
   List<String> get _selectedList => ingredientStates.entries
       .where((e) => e.value == IngredientState.selected)
       .map((e) => e.key)
       .toList();
 
+  // Computes the list of currently excluded ingredient names.
+  // This exists to compile the list of negative search filters.
+  // Returns: A list of ingredient name strings.
   List<String> get _excludedList => ingredientStates.entries
       .where((e) => e.value == IngredientState.excluded)
       .map((e) => e.key)
       .toList();
 
   // ── Chip builder ───────────────────────────────────────────────────────────
+  // Generates an interactive chip widget representing a single ingredient.
+  // This exists to visually represent the three-state (none, selected, excluded) toggle button for each ingredient.
+  // Returns: A custom GestureDetector with animation.
   Widget _buildChip(String ing) {
     final state = ingredientStates[ing] ?? IngredientState.none;
 
@@ -116,6 +135,9 @@ class _IngredientSelectorScreenState extends State<IngredientSelectorScreen> {
   }
 
   // ── Build ──────────────────────────────────────────────────────────────────
+  // Builds the UI layout structure for the ingredient selection and cooking time filter screen.
+  // This exists to listen to custom ingredients, display banners, handle taps, and trigger the search navigation.
+  // Returns: A Scaffold layout containing lists of categories and chips.
   @override
   Widget build(BuildContext context) {
     // Wrap the entire screen with a StreamBuilder so that custom ingredients

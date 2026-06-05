@@ -7,9 +7,14 @@ import 'myrecipes_screen.dart';
 const _kOrange = Color(0xFFF4631E);
 const _kBg = Color(0xFFFFF8F3);
 
+// A stateless screen widget representing the kitchen hub layout.
+// This exists to provide quick links for custom recipe creation ("Add Recipe") and viewing own user recipes.
+// Returns: A MyKitchenScreen widget.
 class MyKitchenScreen extends StatelessWidget {
   const MyKitchenScreen({super.key});
 
+  // Builds the dashboard layout for the kitchen screen.
+  // Returns: A Scaffold layout containing action grid cards.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,6 +50,7 @@ class MyKitchenScreen extends StatelessWidget {
             style: GoogleFonts.dmSans(fontSize: 14, color: Colors.black45),
           ),
           const SizedBox(height: 28),
+          // A 2-column grid presenting the primary kitchen actions
           GridView.count(
             crossAxisCount: 2,
             crossAxisSpacing: 16,
@@ -75,6 +81,9 @@ class MyKitchenScreen extends StatelessWidget {
 
 // ── Kitchen card (identical style to home screen _FeatureCard) ────────────────
 
+// A stateful card component displaying options in the kitchen grid.
+// This exists to manage gesture scaling animations and link navigation targets.
+// Returns: A _KitchenCard widget.
 class _KitchenCard extends StatefulWidget {
   final IconData icon;
   final String title;
@@ -88,15 +97,21 @@ class _KitchenCard extends StatefulWidget {
     required this.cardIndex,
   });
 
+  // Creates the mutable state object for this card widget.
+  // Returns: An instance of _KitchenCardState.
   @override
   State<_KitchenCard> createState() => _KitchenCardState();
 }
 
+// The mutable state class for _KitchenCard.
+// It manages the scaling animation parameters for taps.
 class _KitchenCardState extends State<_KitchenCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scale;
 
+  // Initializes scale animation values when the card is initialized.
+  // Returns: void.
   @override
   void initState() {
     super.initState();
@@ -109,20 +124,28 @@ class _KitchenCardState extends State<_KitchenCard>
     );
   }
 
+  // Releases resources occupied by the animation controller upon widget disposal.
+  // Returns: void.
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  // Navigates to the corresponding screen depending on the card index.
+  // Returns: void.
   void _onTap(BuildContext context) {
     if (widget.cardIndex == 0) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => AddRecipeScreen()));
+      // Redirect to recipe creation screen
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const AddRecipeScreen()));
     } else {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => MyrecipesScreen()));
+      // Redirect to own recipes list screen
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const MyrecipesScreen()));
     }
   }
 
+  // Renders the scaled tap-response card button.
+  // Returns: A ScaleTransition with layout stacks and gestures.
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -205,6 +228,9 @@ class _KitchenCardState extends State<_KitchenCard>
 
 // ── Faint card decorations (reusing home screen patterns) ─────────────────────
 
+// Generates background graphical decorations on the cards.
+// This exists to match the home screen's design aesthetic.
+// Returns: A list of positioned background elements.
 List<Widget> _cardDecorations(int index) {
   switch (index) {
     case 0: // Add Recipe — circles

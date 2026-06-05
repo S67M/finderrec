@@ -10,9 +10,14 @@ import 'db_service.dart';
 const _kOrange = Color(0xFFF4631E);
 const _kBg = Color(0xFFFFF8F3);
 
+// A screen widget representing the recipe creation form.
+// This exists to allow users to input a name, duration, photo, category, ingredients, and instructions to submit a new recipe.
+// Returns: An AddRecipeScreen widget.
 class AddRecipeScreen extends StatefulWidget {
   const AddRecipeScreen({super.key});
 
+  // Creates the mutable state object for the AddRecipeScreen.
+  // Returns: An instance of _AddRecipeScreenState.
   @override
   State<AddRecipeScreen> createState() => _AddRecipeScreenState();
 }
@@ -51,10 +56,15 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   // ── Add-ingredient bottom sheet ─────────────────────────────────────────────
 
+  // Opens a modal bottom sheet allowing users to pick ingredients from base and custom lists.
+  // This exists to provide an interactive categorization and selection interface for recipe ingredients.
+  // Modifies: Resets new ingredient controllers and sets category state.
+  // Returns: void.
   void _openIngredientPicker() {
     // Reset form state each time the sheet opens
     _newIngNameController.clear();
     setState(() {
+      // Set the category default selection to the first available category
       _newIngCategory = kCategoryNames.first;
       _savingNewIng   = false;
     });
@@ -410,10 +420,16 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   // ── Gallery image picker ────────────────────────────────────────────────────
 
+  // Launches the system image picker to choose an image from the user's gallery.
+  // This exists to allow uploading an image directly from device storage.
+  // Modifies: Updates _pickedImageFile with the selected image path.
+  // Returns: Future<void> representing the asynchronous operation.
   Future<void> _pickImageFromGallery() async {
     final picker = ImagePicker();
+    // Prompt the user to select an image from their gallery
     final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (picked != null) {
+      // Update state to render the preview of the picked image
       setState(() {
         _pickedImageFile = File(picked.path);
       });
@@ -422,6 +438,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   // ── Save recipe ─────────────────────────────────────────────────────────────
 
+  // Displays a standardized snackbar with an error message on the screen.
+  // This exists to provide immediate feedback when recipe validation rules fail.
+  // Returns: void.
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -445,7 +464,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     );
   }
 
+  // Validates user input and saves the constructed recipe to Firebase Firestore database.
+  // This exists to commit new custom user recipes to the cloud backend.
+  // Modifies: Writes a new recipe record under the 'recipes' collection. Sets _isSaving flag.
+  // Returns: Future<void> representing the asynchronous write operation.
   Future<void> _saveRecipe() async {
+    // Validate text inputs using the FormState key
     if (!_formKey.currentState!.validate()) return;
 
     // ── Ingredient validation ────────────────────────────────────────────────
@@ -520,6 +544,9 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   // ── Input decoration helper ─────────────────────────────────────────────────
 
+  // Generates a consistently styled InputDecoration object for the screen text fields.
+  // This exists to maintain visual consistency across all forms on the add recipe page.
+  // Returns: An InputDecoration configuration with consistent borders and icons.
   InputDecoration _inputDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText:  label,
@@ -545,6 +572,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   // ── Build ───────────────────────────────────────────────────────────────────
 
+  @override
+  // Builds the UI layout structure for the recipe creation form.
+  // This exists to assemble form inputs, photo upload toggles, dropdowns, and submission button.
+  // Returns: A Scaffold widget with entry form items and validation indicators.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -856,6 +887,10 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
 
   // ── Photo mode toggle button ────────────────────────────────────────────────
 
+  // Generates a styled tab button for toggling between photo upload modes (URL or Gallery).
+  // This exists to support selecting the mode of image attachment dynamically.
+  // Modifies: Resets selected images and updates the _photoMode state.
+  // Returns: A GestureDetector widget representing the tab button.
   Widget _photoModeButton(String mode, IconData icon, String label) {
     final isActive = _photoMode == mode;
     return Expanded(
@@ -892,8 +927,12 @@ class _AddRecipeScreenState extends State<AddRecipeScreen> {
     );
   }
 
+  // Cleans up the text controllers and releases resource references when screen is closed.
+  // This exists to prevent memory leaks in the application.
+  // Returns: void.
   @override
   void dispose() {
+    // Clean up controllers to free resources
     _nameController.dispose();
     _durationController.dispose();
     _photoController.dispose();

@@ -3,18 +3,30 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'recipe_model.dart';
 
+// A service class that handles all Firebase Firestore database operations.
+// This exists to abstract recipe retrieval, custom ingredients creation, 
+// seeding initial data, and tracking favorite recipes for users.
 class DBService {
+  // Instance of FirebaseFirestore to interact with the database collections.
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  // Retrieves all recipes from the 'recipes' collection in Firestore.
+  // This exists to fetch the complete set of system and user recipes.
+  // Returns: A Future resolving to a list of Recipe objects.
   Future<List<Recipe>> getAllRecipes() async {
+    // Query the 'recipes' collection from Firestore
     final snapshot = await _db.collection('recipes').get();
+    // Map each document snapshot to a Recipe instance
     return snapshot.docs.map((doc) => Recipe.fromMap(doc.id, doc.data())).toList();
   }
 
-  /// Returns public recipes (no uid) + the current user's own recipes.
-  /// Used by ingredient-search so users can find their own added recipes too.
+  // Returns public recipes (no uid or empty uid) along with the current user's own recipes.
+  // Used by the ingredient search screen so users can find system recipes as well as their own custom recipes.
+  // Returns: A Future resolving to a filtered list of Recipe objects.
   Future<List<Recipe>> getAllRecipesForUser(String uid) async {
+    // Fetch all recipes from Firestore first
     final snapshot = await _db.collection('recipes').get();
+    // Filter the records on client-side to find public or user-specific recipes
     return snapshot.docs
         .where((doc) {
           final data = doc.data();
@@ -29,23 +41,32 @@ class DBService {
         .toList();
   }
 
-  /// Deletes a recipe document by its Firestore document ID.
+  // Deletes a recipe document by its Firestore document ID.
+  // This exists to allow users to remove recipes they have created.
+  // Modifies: Deletes the corresponding document in the 'recipes' Firestore collection.
+  // Returns: Future<void> representing the asynchronous delete operation.
   Future<void> deleteRecipe(String recipeId) async {
+    // Target the specific recipe document by ID and trigger deletion
     await _db.collection('recipes').doc(recipeId).delete();
   }
 
 
+  // Seeds default recipes into Firestore if the database has fewer than 30 canonical recipes.
+  // This exists to prepopulate the database with sample recipes for the search feature on new installs.
+  // Modifies: Writes multiple default recipes to Firestore 'recipes' collection and deletes stale system recipes.
+  // Returns: Future<void> representing the asynchronous seed operation.
   Future<void> seedInitialRecipes() async {
     try {
-      // Re-seed whenever we have fewer than 24 canonical (non-user) recipes
+      // Re-seed whenever we have fewer than 30 canonical (non-user) recipes
       final allSnapshot = await _db.collection('recipes').get();
       final systemRecipes = allSnapshot.docs
           .where((d) => d.data()['isUserRecipe'] != true)
           .toList();
 
+      // Skip seeding if we already have sufficient system-seeded recipes
       if (systemRecipes.length >= 30) return;
 
-      // Delete old system recipes
+      // Delete old system recipes to prevent duplicate accumulation
       final batch = _db.batch();
       for (final doc in systemRecipes) {
         batch.delete(doc.reference);
@@ -334,6 +355,7 @@ class DBService {
         },
       ];
 
+      // Add all listed default recipes using a Firestore batch write operation
       final addBatch = _db.batch();
       for (final recipe in recipes) {
         final ref = _db.collection('recipes').doc();
@@ -348,28 +370,43 @@ class DBService {
   }
 
 
+  // Toggles the favorite status of a recipe for the currently logged-in user.
+  // This exists to let users save recipes they like to their profile's favorites list.
+  // Modifies: Updates the user's document in the 'users' collection with the modified favorites list.
+  // Returns: Future<void> representing the database update.
   Future<void> toggleFavorite(String recipeId) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
+    // Return early if there is no logged-in user
     if (uid == null) return;
+    
     final doc = _db.collection('users').doc(uid);
     final snapshot = await doc.get();
     
+    // Create new favorites array if user document doesn't exist yet
     if (!snapshot.exists) {
       await doc.set({'favorites': [recipeId]});
     } else {
       List favs = snapshot.data()?['favorites'] ?? [];
+      // If already liked, remove; otherwise, add to list
       if (favs.contains(recipeId)) {
         favs.remove(recipeId);
       } else {
         favs.add(recipeId);
       }
+      // Update favorites list field in Firestore
       await doc.update({'favorites': favs});
     }
   }
 
+  // Retrieves a real-time stream of the favorite recipe IDs for the currently logged-in user.
+  // This exists to dynamically update favorite indicators and lists across the app interface.
+  // Returns: A Stream emitting a list of favorite recipe ID strings.
   Stream<List<String>> getFavorites() {
     final uid = FirebaseAuth.instance.currentUser?.uid;
+    // Return empty stream if no active authentication session
     if (uid == null) return Stream.value([]);
+    
+    // Listen to real-time changes in the user document and map the favorites field
     return _db.collection('users').doc(uid).snapshots().map((snapshot) {
       if (!snapshot.exists) return [];
       return List<String>.from(snapshot.data()?['favorites'] ?? []);
@@ -378,8 +415,12 @@ class DBService {
 
   // ── Custom Ingredients ─────────────────────────────────────────────────────
 
-  /// Saves a new custom ingredient to the global `custom_ingredients` collection.
+  // Saves a new custom ingredient to the global 'custom_ingredients' collection.
+  // This exists to allow users to extend the preset list of ingredients.
+  // Modifies: Creates a new document under 'custom_ingredients' in Firestore.
+  // Returns: Future<void> representing the write operation.
   Future<void> addCustomIngredient(String name, String category) async {
+    // Add the new ingredient to Firestore with a creation timestamp
     await _db.collection('custom_ingredients').add({
       'name': name.trim(),
       'category': category,
@@ -387,8 +428,11 @@ class DBService {
     });
   }
 
-  /// Real-time stream of all custom ingredients as `{name, category}` maps.
+  // Provides a real-time stream of all custom ingredients sorted by creation time.
+  // This exists to sync and display custom ingredients in the ingredient selection screen.
+  // Returns: A Stream emitting a list of maps, where each map contains 'name' and 'category' keys.
   Stream<List<Map<String, String>>> getCustomIngredients() {
+    // Return sorted real-time snapshots of the custom ingredients collection
     return _db
         .collection('custom_ingredients')
         .orderBy('createdAt')
@@ -401,6 +445,7 @@ class DBService {
                 'category': data['category'] as String? ?? '',
               };
             })
+            // Ensure only elements containing valid names and categories are returned
             .where((m) => m['name']!.isNotEmpty && m['category']!.isNotEmpty)
             .toList());
   }

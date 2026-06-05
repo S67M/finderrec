@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// A screen widget representing the user's profile and settings tab.
+// This exists to display profile credentials and provide log out functions.
+// Returns: A ProfileScreen widget.
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  // Handles the sign-out request from Firebase Auth.
+  // This exists to end the user session and return them to the WelcomeScreen.
+  // Returns: Future<void> representing the asynchronous operation.
   void _logout() async {
+    // Triggers firebase sign out operation
     await FirebaseAuth.instance.signOut();
   }
 
+  // Builds the UI layout structure for the profile dashboard.
+  // Returns: A Scaffold widget displaying user information and a logout button.
   @override
   Widget build(BuildContext context) {
+    // Retrieve the currently logged-in user profile from Firebase
     final user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
@@ -19,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           children: [
             const SizedBox(height: 16),
-            // Avatar
+            // Avatar block
             Center(
               child: Container(
                 width: 90,
@@ -33,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            // Email
+            // Email detail view
             Center(
               child: Text(
                 user?.email ?? 'No email',
@@ -44,7 +54,7 @@ class ProfileScreen extends StatelessWidget {
             // Divider section
             const Divider(height: 1, color: Color(0xFFEEEEEE)),
             const SizedBox(height: 24),
-            // Logout tile
+            // Logout button tile trigger
             GestureDetector(
               onTap: _logout,
               child: Container(

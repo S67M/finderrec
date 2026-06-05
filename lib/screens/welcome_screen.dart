@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'auth_screens.dart';
 
+// A stateless screen widget representing the initial welcome/onboarding view.
+// This exists as the landing page for unauthenticated users, offering buttons to log in or register.
+// Returns: A WelcomeScreen widget.
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
   
+  // Builds the UI layout structure for the welcome page.
+  // Returns: A Scaffold layout containing branding logo, text descriptions, and access buttons.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,6 +20,7 @@ class WelcomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+               // Shared logo with hero animations for smooth transitions
                Hero(
                   tag: 'app_logo',
                   child: Center(
@@ -38,6 +44,7 @@ class WelcomeScreen extends StatelessWidget {
                  style: TextStyle(fontSize: 16, color: Colors.black54)
                ),
                const SizedBox(height: 60),
+               // Access button triggering redirection to LoginScreen
                ElevatedButton(
                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())),
                  style: ElevatedButton.styleFrom(
@@ -51,6 +58,7 @@ class WelcomeScreen extends StatelessWidget {
                  child: const Text("Login", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                ),
                const SizedBox(height: 20),
+               // Access button triggering redirection to RegisterScreen
                OutlinedButton(
                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
                  style: OutlinedButton.styleFrom(

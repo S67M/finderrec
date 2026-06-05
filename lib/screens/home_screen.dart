@@ -11,9 +11,14 @@ import 'profile_screen.dart';
 const _kOrange = Color(0xFFF4631E);
 const _kBg = Color(0xFFFFF8F3);
 
+// A stateful screen widget representing the home dashboard container.
+// This exists to manage navigation tabs (Home/Profile) and host the primary dashboard components.
+// Returns: A HomeScreen widget.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  // Creates the mutable state object for this widget in the widget tree.
+  // Returns: An instance of _HomeScreenState.
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -26,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
     ProfileScreen(),
   ];
 
+  // Builds the primary navigation container of the application.
+  // Returns: A Scaffold layout containing custom appBar, bottom navigation bar, and tab content view.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,9 +109,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // ── 2×2 Feature Grid ──────────────────────────────────────────────────────────
 
+// A stateless widget rendering the dashboard grid selection options.
+// This exists to display a 2x2 grid of key features along with "Tip of the Day".
+// Returns: A _HomeGrid widget.
 class _HomeGrid extends StatelessWidget {
   const _HomeGrid();
 
+  // Builds the greeting, features grid, Tip of the Day container, and inspirational footer.
+  // Returns: A ListView layout.
   @override
   Widget build(BuildContext context) {
     final cards = [
@@ -256,6 +268,8 @@ class _HomeGrid extends StatelessWidget {
 
 // ── Card data model ───────────────────────────────────────────────────────────
 
+// A utility model holding configuration data for feature cards in the dashboard.
+// This exists to store display properties, icons, indexing, and target screen widgets.
 class _FeatureCardData {
   final String label;
   final String subtitle;
@@ -263,6 +277,7 @@ class _FeatureCardData {
   final int cardIndex;
   final Widget destination;
 
+  // Constructor for initializing feature card properties.
   const _FeatureCardData({
     required this.label,
     required this.subtitle,
@@ -274,6 +289,9 @@ class _FeatureCardData {
 
 // ── Card background decoration helpers ───────────────────────────────────────
 
+// Generates custom decorative background elements (shapes or icons) for each grid card.
+// This exists to provide visual interest and distinct styling for each feature dashboard card.
+// Returns: A list of positioned background widgets.
 List<Widget> _cardDecorations(int index) {
   switch (index) {
     case 0: // Pick Ingredients — scattered circles
@@ -427,19 +445,28 @@ List<Widget> _cardDecorations(int index) {
 
 // ── Feature Card ──────────────────────────────────────────────────────────────
 
+// A stateful card component corresponding to one feature in the 2x2 home screen grid.
+// This exists to render custom text/icons and manage user click animations.
+// Returns: A _FeatureCard widget.
 class _FeatureCard extends StatefulWidget {
   final _FeatureCardData data;
   const _FeatureCard({required this.data});
 
+  // Creates the mutable state for the feature card.
+  // Returns: An instance of _FeatureCardState.
   @override
   State<_FeatureCard> createState() => _FeatureCardState();
 }
 
+// The mutable state class for _FeatureCard.
+// It manages single ticker animations for a smooth tap-down scale effect.
 class _FeatureCardState extends State<_FeatureCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scale;
 
+  // Initializes scale animation parameters and curves upon card mounting.
+  // Returns: void.
   @override
   void initState() {
     super.initState();
@@ -452,19 +479,26 @@ class _FeatureCardState extends State<_FeatureCard>
     );
   }
 
+  // Cleans up animation controller resources when the card state is disposed.
+  // Returns: void.
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  // Executes page redirection to the feature screen.
+  // Returns: void.
   void _onTap() {
+    // Navigate to the target screen configuration
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => widget.data.destination),
     );
   }
 
+  // Renders the animated scaling feature button card.
+  // Returns: A GestureDetector containing a ScaleTransition and decorative stacks.
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

@@ -10,9 +10,14 @@ const _kBg = Color(0xFFFFF8F3);
 const _kDark = Color(0xFF2D3142);
 const _kGrey = Color(0xFF9E9E9E);
 
+// A screen widget representing the recipe categories dashboard.
+// This exists to group and list all recipe categories, and display a list of all recipes.
+// Returns: A CategoriesScreen widget.
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
 
+  // Creates the mutable state object for this widget in the tree.
+  // Returns: An instance of _CategoriesScreenState.
   @override
   State<CategoriesScreen> createState() => _CategoriesScreenState();
 }
@@ -37,26 +42,40 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   List<Recipe> _allRecipes = [];
   bool _loadingRecipes = true;
 
+  // Initializes state, executing the fetch of recipes upon class instantiation.
+  // This exists to trigger initial load operations before UI renders.
+  // Returns: void.
   @override
   void initState() {
     super.initState();
+    // Retrieve the recipe list immediately on screen startup
     _fetchAllRecipes();
   }
 
+  // Fetches all recipes from the DBService database.
+  // This exists to pull recipe data and update the local state to render recipes under the category cards.
+  // Modifies: Updates the local list _allRecipes and sets the _loadingRecipes boolean status.
+  // Returns: Future<void> representing the asynchronous database query.
   Future<void> _fetchAllRecipes() async {
     try {
+      // Execute the database retrieval call
       final recipes = await _db.getAllRecipes();
       if (mounted) {
+        // Refresh local state to render list
         setState(() {
           _allRecipes = recipes;
           _loadingRecipes = false;
         });
       }
     } catch (_) {
+      // In case of query failures, disable loading spinner
       if (mounted) setState(() => _loadingRecipes = false);
     }
   }
 
+  // Builds the UI layout structure for the categories dashboard page.
+  // This exists to display category grids, loading states, custom lists, and fav streams.
+  // Returns: A Scaffold layout containing grids and recipes list.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,12 +170,17 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
 // ── Background-image category card ───────────────────────────────────────────
 
+// A stateless helper card widget presenting a category item with a background photo.
+// This exists to provide an interactive card that redirects user to a list of recipes filtered by the card's category.
+// Returns: A _CategoryCard widget.
 class _CategoryCard extends StatelessWidget {
   final String name;
   final String imageUrl;
 
   const _CategoryCard({required this.name, required this.imageUrl});
 
+  // Builds the card button with network images, gradients, and custom labels.
+  // Returns: A GestureDetector container layout.
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

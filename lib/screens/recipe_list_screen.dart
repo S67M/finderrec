@@ -7,6 +7,8 @@ import 'recipe_model.dart';
 
 // ── Matching-algorithm constants ───────────────────────────────────────────────
 
+// The list of primary food categories that represent substantive ingredients.
+// This exists to classify and validate whether the user has selected at least one core ingredient.
 const List<String> _bigFour = [
   "Proteins",
   "Vegetables",
@@ -14,6 +16,8 @@ const List<String> _bigFour = [
   "Fruits",
 ];
 
+// The hierarchical priority order for sorting recipe search results.
+// This exists to order matching recipes based on matches in key food groups first.
 const List<String> _categoryPriority = [
   "Proteins",
   "Vegetables",
@@ -29,29 +33,36 @@ const List<String> _categoryPriority = [
 // ── Priority sort ──────────────────────────────────────────────────────────────
 // [ingredientCategory] is the combined base + custom map built at runtime.
 
+// Sorts and filters the given recipes by priority based on match counts and food group rules.
+// This exists to arrange matching recipes so the most relevant/complete meals are displayed first.
+// Modifies: Filters and sorts the recipes list argument.
+// Returns: A new sorted and filtered list of Recipe objects.
 List<Recipe> _sortByPriority(
   List<Recipe> recipes,
   List<String> selected,
   Map<String, String> ingredientCategory,
 ) {
+  // Find which of the user's selected ingredients belong to the core Big Four categories
   final selectedBigFour = selected
       .where((i) => _bigFour.contains(ingredientCategory[i]))
       .toList();
 
-  // Law 2 — keep only recipes that match at least one bigFour selected ingredient
+  // Law 2 — Keep only recipes that match at least one bigFour selected ingredient
   recipes = recipes.where((r) {
     return selectedBigFour.any((i) => r.ingredients.contains(i));
   }).toList();
 
-  // Law 3 — sort by bigFour count first, then by category priority
+  // Law 3 — Sort by bigFour count first (descending), then by category priority
   recipes.sort((a, b) {
     final bigFourA =
         selectedBigFour.where((i) => a.ingredients.contains(i)).length;
     final bigFourB =
         selectedBigFour.where((i) => b.ingredients.contains(i)).length;
 
+    // Place recipes with more Big Four matches at the top
     if (bigFourB != bigFourA) return bigFourB.compareTo(bigFourA);
 
+    // If Big Four counts are equal, fall back to sorting by category priority hierarchies
     for (final category in _categoryPriority) {
       final catIngredients =
           selected.where((i) => ingredientCategory[i] == category).toList();
@@ -69,6 +80,9 @@ List<Recipe> _sortByPriority(
 
 // ── Screen ─────────────────────────────────────────────────────────────────────
 
+// A screen widget representing the filtered search results or browsed category recipe list.
+// This exists to present recipe matching outputs or group browse listings of the app.
+// Returns: A RecipeListScreen widget.
 class RecipeListScreen extends StatefulWidget {
   final String? category;
   final List<String>? ingredients;
@@ -83,26 +97,42 @@ class RecipeListScreen extends StatefulWidget {
     this.timeFilter,
   });
 
+  // Creates the mutable state object for this screen.
+  // Returns: An instance of _RecipeListScreenState.
   @override
   State<RecipeListScreen> createState() => _RecipeListScreenState();
 }
 
+// The mutable state class for RecipeListScreen.
+// It manages custom ingredient syncing, recipe fetching, priority filtering, and layout building.
 class _RecipeListScreenState extends State<RecipeListScreen> {
+  // Database service wrapper
   final DBService _db = DBService();
+  
+  // Local list of loaded/filtered recipes to render
   List<Recipe> _recipes = [];
+  
+  // Loading status indicator flag
   bool _loading = true;
+  
+  // Banner visibility indicating if a grocery run is recommended
   bool _showShoppingMessage = false; // Law 1
 
-  // Custom ingredients loaded from Firestore before filtering
+  // Cache of custom user ingredients loaded from Firestore
   List<Map<String, String>> _customIngredients = [];
 
+  // Initializes screen state, loading ingredients and fetching recipe data.
+  // Returns: void.
   @override
   void initState() {
     super.initState();
     _loadAndFetch();
   }
 
-  /// Loads custom ingredients first, then runs the recipe fetch + filter logic.
+  // Loads custom ingredients first, then runs the recipe fetch + filter logic.
+  // This exists to compile the global ingredient database map before executing matches.
+  // Modifies: Updates _customIngredients list.
+  // Returns: Future<void> representing asynchronous setup steps.
   Future<void> _loadAndFetch() async {
     try {
       // Wait for the first emission of the custom ingredients stream
@@ -111,9 +141,14 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
     } catch (_) {
       // If the collection doesn't exist yet, proceed with empty list
     }
+    // Fetch and filter recipes based on current configuration
     _fetchRecipes();
   }
 
+  // Performs main recipe loading, category filtering, exclusions, and sorting operations.
+  // This exists to execute the search engine rules dynamically based on parameter settings.
+  // Modifies: Updates local _recipes list, _showShoppingMessage flag, and _loading status.
+  // Returns: void.
   void _fetchRecipes() async {
     // Build the complete ingredient→category map (base + custom)
     final ingredientCategory = buildIngredientCategoryMap(_customIngredients);
@@ -188,6 +223,8 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
   }
 
 
+  // Builds the UI layout structure for the recipe list/results screen.
+  // Returns: A Scaffold layout containing list view, loading indicator or shopping message.
   @override
   Widget build(BuildContext context) {
     final title = widget.category != null
@@ -247,9 +284,13 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
 
 // ── Law 1 — Shopping message widget ───────────────────────────────────────────
 
+// A stateless widget presenting a prompt when no core food ingredients are selected.
+// This exists to encourage the user to add essential cooking ingredients to make a complete meal.
+// Returns: A _ShoppingMessage widget.
 class _ShoppingMessage extends StatelessWidget {
   const _ShoppingMessage();
 
+  // List of possible humorous messages recommending a shopping trip
   static const List<String> _messages = [
     "Looks like your fridge needs a grocery run! 🛒",
     "Even the best chefs need real ingredients. Time to shop! 🛍️",
@@ -257,9 +298,11 @@ class _ShoppingMessage extends StatelessWidget {
     "No proteins, veggies, grains, or fruits? That's a season finale cliffhanger! 🍽️",
   ];
 
+  // Builds the layout for the shopping message card display.
+  // Returns: A Center widget container with details and redirect options.
   @override
   Widget build(BuildContext context) {
-    // Pick a message deterministically (same every time, feels intentional)
+    // Pick a message deterministically based on seconds elapsed
     final message = _messages[DateTime.now().second % _messages.length];
 
     return Center(
@@ -311,7 +354,9 @@ class _ShoppingMessage extends StatelessWidget {
   }
 }
 
-
+// A reusable card widget rendering details of an individual recipe item.
+// This exists to show the user the name, preparation duration, ingredients list, and favorites toggle for a recipe.
+// Returns: A RecipeCard widget.
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
   final bool isFavorite;
@@ -324,6 +369,8 @@ class RecipeCard extends StatelessWidget {
     required this.onFavoriteToggle,
   });
 
+  // Builds the card layout structure detailing a single recipe.
+  // Returns: A Container widget containing thumbnail image, favorite button, and instruction text.
   @override
   Widget build(BuildContext context) {
     return Container(
