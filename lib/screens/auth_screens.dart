@@ -39,10 +39,27 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       // Attempt login with Firebase Authentication using email and password
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+      
+      // Check if user has verified their email address
+      if (cred.user != null && !cred.user!.emailVerified) {
+        // Sign out user since email is not verified
+        await FirebaseAuth.instance.signOut();
+        if (!mounted) return;
+        
+        // Show message requesting verification first
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please verify your email first"),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        return;
+      }
+      
       if (!mounted) return;
       
       // Navigate to AuthWrapper and clear the navigation stack upon success
@@ -204,7 +221,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // Update display name for the newly created user profile
       await cred.user?.updateDisplayName(_nameController.text.trim());
       
+      // Send verification email to the user
+      await cred.user?.sendEmailVerification();
+      
+      // Sign out the user immediately after registration
+      await FirebaseAuth.instance.signOut();
+      
       if (!mounted) return;
+      
+      // Show confirmation SnackBar to check email
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please check your email to verify your account"),
+        ),
+      );
       
       // Navigate to AuthWrapper, resetting the navigation history
       Navigator.of(context).pushAndRemoveUntil(
